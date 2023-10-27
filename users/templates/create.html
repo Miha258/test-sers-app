@@ -1,0 +1,62 @@
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="alert alert-success alert-dismissible fade show" role="alert"></div>
+        <div class="modal-header">
+          <h5 class="modal-title" id="createUserModalLabel">Modal title</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input id="createUsername" type="text" class="form-control" placeholder="Username" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input id="createEmail" type="text" class="form-control" placeholder="Email" aria-label="Email" aria-describedby="basic-addon1">
+            </div>
+            <select id="createGroup" class="form-select" aria-label="Default select example">
+                <option selected>Open this select menu</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+            </select>
+            <div class="input-group-text mt-3">
+                <input id="isAdmin" type="checkbox" aria-label="Checkbox for following text input">
+                &nbsp;Admin
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button onclick="createUser()" type="button" class="btn btn-secondary">Create user</button>
+        </div>
+      </div>
+    </div>
+</div>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+    Create user
+</button>
+<script>
+    function createUser(event) {
+        fetch('http://{{ request.get_host }}/users/create', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: document.getElementById('createUsername').value,
+                email: document.getElementById('createEmail').value,
+                group_id: document.getElementById('createGroup').value,
+                is_admin: document.getElementById('isAdmin').checked
+            })
+        }).then(async response => {
+            if (!response.ok) {
+                const { error } = await response.json()
+                const alert = document.querySelector('.alert')
+                alert.style.display = 'block'
+                alert.innerText = error
+            } else {
+                location.reload()
+            }
+        })
+    }
+</script>
