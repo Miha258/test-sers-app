@@ -3,7 +3,7 @@
       <div class="modal-content">
         <div class="alert alert-success alert-dismissible fade show" role="alert"></div>
         <div class="modal-header">
-          <h5 class="modal-title" id="createUserModalLabel">Modal title</h5>
+          <h5 class="modal-title" id="createUserModalLabel">Creating user</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -22,7 +22,7 @@
                 <option value="3">Three</option>
             </select>
             <div class="input-group-text mt-3">
-                <input id="isAdmin" type="checkbox" aria-label="Checkbox for following text input">
+                <input id="isAdmin" type="checkbox">
                 &nbsp;Admin
             </div>
         </div>
@@ -51,9 +51,7 @@
         }).then(async response => {
             if (!response.ok) {
                 const { error } = await response.json()
-                const alert = document.querySelector('.alert')
-                alert.style.display = 'block'
-                alert.innerText = error
+                showError(error)
             } else {
                 location.reload()
             }

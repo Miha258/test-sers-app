@@ -30,13 +30,22 @@ def edit_user(request, id):
     try:
         updated = loads(request.body.decode('utf-8'))
         user = Users.objects.get(id = int(id))
+        print(user.username)
         user.username = updated['username']
         user.group_id = int(updated['group_id'])
         user.is_admin = updated['is_admin']
+        
         user.save()
+        print(Users.objects.get(id = int(id)).username)
         return JsonResponse({'message': 'User updated successfully'}, status = 200)
     except ValueError:
-        return JsonResponse({'error': 'Invalid group value. Try again'}, status=400)
-    
-def delete_user(request):
-    return Users.objects.filter(id = id).delete()
+        return JsonResponse({'error': 'Invalid group value. Try again'}, status = 400)
+
+@csrf_exempt
+def delete_user(request, id):
+    try:
+        user = Users.objects.get(id = int(id))
+        user.delete()
+        return JsonResponse({'message': 'User updated successfully'}, status = 200)
+    except Exception as e:
+        return JsonResponse({'error': repr(e)}, status = 400)

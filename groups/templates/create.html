@@ -1,0 +1,79 @@
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="alert alert-success alert-dismissible fade show" role="alert"></div>
+        <div class="modal-header">
+          <h5 class="modal-title" id="createUserModalLabel">Creating user</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input id="editName" type="text" class="form-control" placeholder="Name" aria-label="Name" aria-describedby="basic-addon1">
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="dataAnalitics" type="checkbox">
+                &nbsp;Data analitics
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="serviceAnalitics" type="checkbox">
+                &nbsp;Service analitics
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="voiceAnalitics" type="checkbox">
+                &nbsp;Voice analitics
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="queueStatus" type="checkbox">
+                &nbsp;Queue status
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="voiceStatus" type="checkbox">
+                &nbsp;Voice status
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="video" type="checkbox">
+                &nbsp;Video
+            </div>
+            <div class="input-group-text mt-3">
+                <input id="smartAccess" type="checkbox">
+                &nbsp;Smart access
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text" id="basic-addon1">@</span>
+                <input id="editDescription" type="text" class="form-control" placeholder="Description" aria-label="Description" aria-describedby="basic-addon1">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button onclick="createGroup()" type="button" class="btn btn-secondary">Create user</button>
+        </div>
+      </div>
+    </div>
+</div>
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createUserModal">
+    Create group
+</button>
+<script>
+    function createGroup(event) {
+        
+        fetch('http://{{ request.get_host }}/group/create', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                username: document.getElementById('createUsername').value,
+                email: document.getElementById('createEmail').value,
+                group_id: document.getElementById('createGroup').value,
+                is_admin: document.getElementById('isAdmin').checked
+            })
+        }).then(async response => {
+            if (!response.ok) {
+                const { error } = await response.json()
+                showError(error)
+            } else {
+                location.reload()
+            }
+        })
+    }
+</script>

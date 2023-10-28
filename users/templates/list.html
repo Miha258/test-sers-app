@@ -13,23 +13,45 @@
         <thead>
           <tr>
             <th scope="col">id</th>
+            <th scope="col">Username</th>
             <th scope="col">Email</th>
-            <th scope="col">Group</th>
+            <th scope="col">Group id</th>
             <th scope="col">Admin</th>
+            <th scope="col">Created at</th>
             <th scope="col">Actions</th>
           </tr>
         </thead>
         <tbody>
             {% for user in users %}
                 <tr>
-                    <th scope="row">1</th>
                     <td>{{user.id}}</td>
+                    <td>{{user.username}}</td>
                     <td>{{user.email}}</td>
-                    <td>{{user.group}}</td>
-                    <td>{{user.admin}}</td>
+                    <td>{{user.group_id}}</td>
+                    {% if user.is_admin == True %}
+                        <td><input checked disabled class="form-check-input mt-0" type="checkbox" value=""></td>
+                    {% else %}
+                        <td><input disabled class="form-check-input mt-0" type="checkbox" value=""></td>
+                    {% endif %}
+                    <td>{{user.created_at}}</td>
                     <td>
-                        <a class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#userModal" data-bs-user-id="{{user.id}}">
+                        <a class="btn btn-primary" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#editUserModal" 
+                            data-bs-user-id="{{user.id}}"
+                            data-bs-username="{{user.username}}"
+                            data-bs-group-id="{{user.group_id}}"
+                            data-bs-is-admin="{{user.is_admin}}"
+                            >
                             Edit user
+                        </a>
+                        <a class="btn btn-primary" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#deleteUserModal" 
+                            data-bs-user-id="{{user.id}}"
+                            data-bs-username="{{user.username}}"
+                            >
+                            Delete user
                         </a>
                     </td>
                 </tr>
@@ -38,28 +60,60 @@
     </table>
     {% include 'edit.html' %}
     {% include 'create.html' %}
+    {% include 'delete.html' %}
     <script>
-        const targetModal = document.getElementById('userModal')
-        targetModal.addEventListener('show.bs.modal', event => {
+        function showError(error){
+            const alert = document.querySelector('.alert')
+            alert.style.display = 'block'
+            alert.innerText = error
+        }
+
+        const editUserModal = document.getElementById('editUserModal')
+        editUserModal.addEventListener('show.bs.modal', event => {
             const button = event.relatedTarget
             const user_id = button.getAttribute('data-bs-user-id')
+            const username = button.getAttribute('data-bs-username')
+            const group_id = button.getAttribute('data-bs-group-id')
+            const is_admin = button.getAttribute('data-bs-is-admin')
+    
+            document.getElementById('editUsername').value = username
+            document.getElementById('editGroup').value = group_id
+            document.getElementById('editIsAdmin').checked = is_admin == 'True' ? true : false
+            console.log(document.getElementById('editUserButton'))
             document.getElementById('editUserButton').onclick = () => {
                 fetch(`http://{{ request.get_host }}/users/edit/${user_id}`, {
-                    method: "POST",
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        username: document.getElementById('username').value,
-                        group_id: document.getElementById('group').value,
-                        is_admin: document.getElementById('isAdmin').checked
+                        username: document.getElementById('editUsername').value,
+                        group_id: document.getElementById('editGroup').value,
+                        is_admin: document.getElementById('editIsAdmin').checked
                     })
                 }).then(async response => {
                     if (!response.ok) {
                         const { error } = await response.json()
-                        const alert = document.querySelector('.alert')
-                        alert.style.display = 'block'
-                        alert.innerText = error
+                        showError(error)
+                    } else {
+                        location.reload()
+                    }
+                })
+            }  
+        })
+        const deleteUserModal = document.getElementById('deleteUserModal')
+        deleteUserModal.addEventListener('show.bs.modal', event => {
+            const button = event.relatedTarget
+            const user_id = button.getAttribute('data-bs-user-id')
+            const username = button.getAttribute('data-bs-username')
+            document.getElementById('deleteUserText').innerText = `Do you wnat to delete '${username}' user`
+            document.getElementById('deleteUserButton').onclick = () => {
+                fetch(`http://{{ request.get_host }}/users/delete/${user_id}`, {
+                    method: "DELETE"
+                }).then(async response => {
+                    if (!response.ok) {
+                        const { error } = await response.json()
+                        showError(error)
                     } else {
                         location.reload()
                     }
